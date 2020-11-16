@@ -15,6 +15,8 @@ import statsmodels.api as sm
 import matplotlib
 
 import sys
+import argparse
+import csv
 
 from statsmodels.graphics.tsaplots import plot_acf
 from statsmodels.graphics.tsaplots import plot_pacf
@@ -24,6 +26,91 @@ matplotlib.rcParams['xtick.labelsize'] = 12
 matplotlib.rcParams['ytick.labelsize'] = 12
 matplotlib.rcParams['text.color'] = 'G'
 
+def parseArgs():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-i', '--input')
+    parser.add_argument('-o', '--output')
+    parser.add_argument('--days')
+    parser.add_argument('-S')
+    parser.add_argument('--auto')
+    parser.add_argument('-p')
+    parser.add_argument('-d')
+    parser.add_argument('-q')
+    parser.add_argument('-P')
+    parser.add_argument('-D')
+    parser.add_argument('-Q')
+    args = parser.parse_args()
+    
+    if not args.input:
+        print("Usage: predict.py --input inputFile --output outFile --days 20 -p ....")
+        print("Input file is mandatory")
+        sys.exit(0)
+    else:
+        csv_input=args.input
+    
+    if not args.input:
+        out_data="default.csv"
+    else:
+        out_data=args.output
+    
+    if not args.days:
+        print("Using default number of days: 5.")
+        no_days=5
+    else:
+        no_days=int(args.days)
+    
+    if not args.S:
+        print("Using default seasonal parameter: 0.")
+        S=0
+    else:
+        S=int(args.S)
+    
+    if not args.auto:
+        print("Using default seasonal parameter: 1.")
+        auto=1
+    else:
+        auto=int(args.auto)
+    
+    if not args.p:
+        print("Using default regression parameter: 1.")
+        p=1
+    else:
+        p=int(args.p)
+    
+    if not args.d:
+        print("Using default differential parameter: 1.")
+        d=1
+    else:
+        d=int(args.d)
+    
+    if not args.q:
+        print("Using default average parameter: 1.")
+        q=1
+    else:
+        q=int(args.q)
+    
+    if not args.P:
+        print("Using default seasonal regression parameter: 1.")
+        P=1
+    else:
+        P=int(args.P)
+    
+    if not args.D:
+        print("Using default seasonal differential parameter: 1.")
+        D=1
+    else:
+        D=int(args.D)
+    
+    if not args.Q:
+        print("Using default seasonal average parameter: 1.")
+        Q=1
+    else:
+        Q=int(args.Q)
+    
+    
+    
+    return csv_input, out_data, no_days, S, auto, p, d, q, P, D, Q
+    
 def forecastTimeSeries(y,no_days=100,S=2,p=1,d=1,q=0,P=1,D=1,Q=1,auto=0):
     
     #
@@ -111,8 +198,10 @@ def forecastTimeSeries(y,no_days=100,S=2,p=1,d=1,q=0,P=1,D=1,Q=1,auto=0):
 
 def main():
 #    csv_input="date_reale.csv"
-    csv_input="export.csv"
-
+    #csv_input="export.csv"
+    #parseArgs()
+    #python predict.py --input export.csv --output result.csv --days 20 -S 20 --auto 0 -p 1 -d 1 -q 1 -P 1 -Q 1 -D 1
+    [csv_input, out_data, no_days, S, auto, p, d, q, P, D, Q] = parseArgs()      
     df = pd.read_csv(csv_input, parse_dates=[0])
     df=df[df.forecast==0]
     L=len(df.index)
@@ -126,20 +215,29 @@ def main():
     
     y=upsample_df.drop(['forecast'],axis=1)
 
-    S=7
-    no_days=20
-    forecast,pred_ci=forecastTimeSeries(y,no_days,S,auto=1)
+    pred,pred_ci=forecastTimeSeries(y,no_days,S,auto=auto)
+    pred=pred.to_frame()
+    pred['valoare'] = pred[0]
+    pred=pred.drop(0,axis=1)
+    result=pd.concat([df,pred])
+    result=pd.concat([result,pred_ci],axis=1,sort=False)
+    result['forecast']=result['forecast'].fillna(1)
+    result.to_csv(out_data,index=False, quoting=csv.QUOTE_ALL)
+
+    if (1):
+        ax = y.plot(label='observed', figsize=(14, 4))
+        pred.plot(ax=ax, label='Forecast')
+        ax.fill_between(pred_ci.index,
+                        pred_ci.iloc[:, 0],
+                        pred_ci.iloc[:, 1], color='k', alpha=.25)
+        ax.set_xlabel('Data')
+        ax.set_ylabel('Nr. cazuri')
+        plt.legend()
+        plt.show()
     
-    ax = y.plot(label='observed', figsize=(14, 4))
-    forecast.plot(ax=ax, label='Forecast')
-    ax.fill_between(pred_ci.index,
-                    pred_ci.iloc[:, 0],
-                    pred_ci.iloc[:, 1], color='k', alpha=.25)
-    ax.set_xlabel('Data')
-    ax.set_ylabel('Nr. cazuri')
-    plt.legend()
-    plt.show()
+
     
+
 
 if __name__ == "__main__":
     main()
