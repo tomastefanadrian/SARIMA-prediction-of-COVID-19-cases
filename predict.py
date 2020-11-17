@@ -18,8 +18,8 @@ import sys
 import argparse
 import csv
 
-from statsmodels.graphics.tsaplots import plot_acf
-from statsmodels.graphics.tsaplots import plot_pacf
+#from statsmodels.graphics.tsaplots import plot_acf
+#from statsmodels.graphics.tsaplots import plot_pacf
 
 matplotlib.rcParams['axes.labelsize'] = 14
 matplotlib.rcParams['xtick.labelsize'] = 12
@@ -214,15 +214,14 @@ def main():
     upsample_df['valoare']=upsample_df['valoare'].apply(np.floor)
     
     y=upsample_df.drop(['forecast'],axis=1)
-
     pred,pred_ci=forecastTimeSeries(y,no_days,S,auto=auto)
     pred=pred.to_frame()
-    pred['valoare'] = pred[0]
-    pred=pred.drop(0,axis=1)
+    pred['valoare'] = pred['predicted_mean']
+    pred=pred.drop('predicted_mean',axis=1)
     result=pd.concat([df,pred])
     result=pd.concat([result,pred_ci],axis=1,sort=False)
     result['forecast']=result['forecast'].fillna(1)
-    result.to_csv(out_data,index=False, quoting=csv.QUOTE_ALL)
+    result.to_csv(out_data,index=True, quoting=csv.QUOTE_ALL)
 
     if (1):
         ax = y.plot(label='observed', figsize=(14, 4))
@@ -235,9 +234,6 @@ def main():
         plt.legend()
         plt.show()
     
-
-    
-
-
 if __name__ == "__main__":
     main()
+    
