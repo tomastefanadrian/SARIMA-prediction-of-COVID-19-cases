@@ -153,7 +153,7 @@ def forecastTimeSeries(y,no_days=100,S=2,p=1,d=1,q=0,P=1,D=1,Q=1,auto=0):
 #    results.plot_diagnostics(figsize=(18, 8))
 #    plt.show()
 #    #
-    pred = results.get_prediction(start=pd.to_datetime('2020-09-02'), dynamic=False)
+     #pred = results.get_prediction(start=pd.to_datetime('2020-09-02'), dynamic=False)
 #    pred_ci = pred.conf_int()
 #    ax = y['2020':].plot(label='observed')
 #    pred.predicted_mean.plot(ax=ax, label='One-step ahead Forecast', alpha=.7, figsize=(14, 4))
@@ -165,7 +165,7 @@ def forecastTimeSeries(y,no_days=100,S=2,p=1,d=1,q=0,P=1,D=1,Q=1,auto=0):
 #    plt.legend()
 #    plt.show()
     ##
-    y_forecasted = pred.predicted_mean
+    #y_forecasted = pred.predicted_mean
 #    y_truth = y['2020-06-01':]
 #    mse = ((y_forecasted - y_truth) ** 2).mean()
 #    print('The Mean Squared Error is {}'.format(round(mse, 2)))
@@ -184,7 +184,7 @@ def forecastTimeSeries(y,no_days=100,S=2,p=1,d=1,q=0,P=1,D=1,Q=1,auto=0):
 #    plt.legend()
 #    plt.show()
 #    
-    y_forecasted = pred.predicted_mean
+    #y_forecasted = pred.predicted_mean
 #    y_forecasted.head(12)
     
 #    y_truth.head(12)
