@@ -18,8 +18,6 @@ import sys
 import argparse
 import csv
 
-#from statsmodels.graphics.tsaplots import plot_acf
-#from statsmodels.graphics.tsaplots import plot_pacf
 
 matplotlib.rcParams['axes.labelsize'] = 14
 matplotlib.rcParams['xtick.labelsize'] = 12
@@ -107,13 +105,10 @@ def parseArgs():
     else:
         Q=int(args.Q)
     
-    
-    
     return csv_input, out_data, no_days, S, auto, p, d, q, P, D, Q
     
 def forecastTimeSeries(y,no_days=100,S=2,p=1,d=1,q=0,P=1,D=1,Q=1,auto=0):
     
-    #
     if (auto==1):
         p = d = q = range(0, 2)
         pdq = list(itertools.product(p, d, q))
@@ -149,57 +144,16 @@ def forecastTimeSeries(y,no_days=100,S=2,p=1,d=1,q=0,P=1,D=1,Q=1,auto=0):
         
         results = mod.fit()
     
-#    print(results.summary().tables[1])    
-#    results.plot_diagnostics(figsize=(18, 8))
-#    plt.show()
-#    #
-     #pred = results.get_prediction(start=pd.to_datetime('2020-09-02'), dynamic=False)
-#    pred_ci = pred.conf_int()
-#    ax = y['2020':].plot(label='observed')
-#    pred.predicted_mean.plot(ax=ax, label='One-step ahead Forecast', alpha=.7, figsize=(14, 4))
-#    ax.fill_between(pred_ci.index,
-#                    pred_ci.iloc[:, 0],
-#                    pred_ci.iloc[:, 1], color='k', alpha=.2)
-#    ax.set_xlabel('Date')
-#    ax.set_ylabel('Retail_sold')
-#    plt.legend()
-#    plt.show()
-    ##
-    #y_forecasted = pred.predicted_mean
-#    y_truth = y['2020-06-01':]
-#    mse = ((y_forecasted - y_truth) ** 2).mean()
-#    print('The Mean Squared Error is {}'.format(round(mse, 2)))
-#    print('The Root Mean Squared Error is {}'.format(round(np.sqrt(mse), 2)))
-    
-    
     pred_uc = results.get_forecast(steps=no_days)
     pred_ci = pred_uc.conf_int()
-#    ax = y.plot(label='observed', figsize=(14, 4))
-#    pred_uc.predicted_mean.plot(ax=ax, label='Forecast')
-#    ax.fill_between(pred_ci.index,
-#                    pred_ci.iloc[:, 0],
-#                    pred_ci.iloc[:, 1], color='k', alpha=.25)
-#    ax.set_xlabel('Date')
-#    ax.set_ylabel('Sales')
-#    plt.legend()
-#    plt.show()
-#    
-    #y_forecasted = pred.predicted_mean
-#    y_forecasted.head(12)
-    
-#    y_truth.head(12)
-    
-#    pred_ci.head(24)
-    
     forecast = pred_uc.predicted_mean
-#    forecast.head(12)
+
     return forecast,pred_ci
 
 
 def main():
-#    csv_input="date_reale.csv"
+    #csv_input="date_reale.csv"
     #csv_input="export.csv"
-    #parseArgs()
     #python predict.py --input export.csv --output result.csv --days 20 -S 20 --auto 0 -p 1 -d 1 -q 1 -P 1 -Q 1 -D 1
     [csv_input, out_data, no_days, S, auto, p, d, q, P, D, Q] = parseArgs()      
     df = pd.read_csv(csv_input, parse_dates=[0])
